@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mini YouTube - Upload</title>
+  <title>Mini YouTube - HLS Streaming</title>
   <style>
     body { font-family: sans-serif; margin: 2rem; }
-    video { display: block; margin-top: 1rem; max-width: 400px; }
+    video { width: 480px; display: block; margin-top: 1rem; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
   <h2>Upload a Video</h2>
@@ -16,16 +17,20 @@
 
   <h3>Available Videos</h3>
   {% for f in files %}
-    <p><strong>{{ f }}</strong></p>
-    <video controls src="/videos/{{ f }}"></video>
-
     {% set folder = f.split('.')[0] %}
-    <div style="margin-left: 20px;">
-      {% for res in ["240p", "480p", "720p"] %}
-        <p>{{ res }}</p>
-        <video controls src="/videos/{{ folder }}/{{ folder }}_{{ res }}.mp4"></video>
-      {% endfor %}
-    </div>
+    <p><strong>{{ f }}</strong></p>
+    <video id="video_{{ loop.index }}" controls></video>
+    <script>
+      if (Hls.isSupported()) {
+        var video = document.getElementById("video_{{ loop.index }}");
+        var hls = new Hls();
+        hls.loadSource("/videos/{{ folder }}/master.m3u8");
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = "/videos/{{ folder }}/master.m3u8";
+      }
+    </script>
   {% endfor %}
 </body>
 </html>
