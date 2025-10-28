@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mini YouTube - Upload</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    video { display: block; margin-top: 1rem; max-width: 400px; }
+  </style>
+</head>
+<body>
+  <h2>Upload a Video</h2>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Upload</button>
+  </form>
+
+  <h3>Available Videos</h3>
+  {% for f in files %}
+    <p><strong>{{ f }}</strong></p>
+    <video controls src="/videos/{{ f }}"></video>
+
+    {% set folder = f.split('.')[0] %}
+    <div style="margin-left: 20px;">
+      {% for res in ["240p", "480p", "720p"] %}
+        <p>{{ res }}</p>
+        <video controls src="/videos/{{ folder }}/{{ folder }}_{{ res }}.mp4"></video>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</body>
+</html>
